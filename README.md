@@ -32,8 +32,7 @@ Done! You can now access the API like this:
 
 ```bash
 curl \
-  'https://<your_worker_endpoint>.workers.dev/v1/models/gemini-2.0-flash-001:generateContent' \
-  -H 'Authorization: Bearer <your_API_KEY_defined_above>' \
+  'https://<your_worker_endpoint>.workers.dev/v1/models/gemini-2.0-flash-001:generateContent?key=<your_API_KEY_defined_above>' \
   -H 'Content-Type: application/json' \
   -X POST \
   --data-raw '{
