@@ -65,10 +65,13 @@ async function handleMessagesEndpoint(request, env, api_token, originalUrl) {
   // also "global" does not support all models yet
   const colo = request.cf && request.cf.colo;
   let region = "us-central1";
-  if (EU_CF_COLOS.has(colo)) {
-    region = "europe-west4";
-  } else if (ASIA_CF_COLOS.has(colo)) {
-    region = "us-west1";
+
+  if (modelName.indexOf("preview") < 0) {  // preview model is only available at us-central1
+    if (EU_CF_COLOS.has(colo)) {
+      region = "europe-west4";
+    } else if (ASIA_CF_COLOS.has(colo)) {
+      region = "us-west1";
+    }
   }
 
   // Construct the new URL for the Google Cloud AI Platform
