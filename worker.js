@@ -14,12 +14,13 @@ async function handleRequest(request, env) {
         return createErrorResponse(405, "invalid_request_error", "GET method is not allowed");
     }
 
-    let url = new URL(request.url);
-    const apiKey = url.searchParams.get("key");
-    if (!env.API_KEY || env.API_KEY !== apiKey) {
-        return createErrorResponse(401, "authentication_error", "invalid x-api-key");
+    const authHeader = request.headers.get('Authorization');
+    const key = authHeader && authHeader.split(' ')[1];
+    if (!env.API_KEY || env.API_KEY !== key) {
+        return createErrorResponse(401, "authentication_error", "invalid api_key");
     }
-    url.searchParams.delete("key");
+
+    let url = new URL(request.url);
     const signedJWT = await createSignedJWT(env.CLIENT_EMAIL, env.PRIVATE_KEY)
     const [token, err] = await exchangeJwtForAccessToken(signedJWT)
     if (token === null) {
