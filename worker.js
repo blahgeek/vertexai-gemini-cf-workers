@@ -47,7 +47,7 @@ async function handleRequest(request, env) {
         return createErrorResponse(500, "api_error", "An unexpected error occurred");
     }
 }
- 
+
 async function handleMessagesEndpoint(request, env, api_token, originalUrl) {
 
   // Parse the original path to extract model name and endpoint
