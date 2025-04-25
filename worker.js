@@ -60,12 +60,15 @@ async function handleMessagesEndpoint(request, env, api_token, originalUrl) {
   const modelName = pathParts[pathParts.length - 1].split(':')[0];
   const endpoint = pathParts[pathParts.length - 1].split(':')[1];
 
+  // https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations#europe
+  // not every model is available in all regions
+  // also "global" does not support all models yet
   const colo = request.cf && request.cf.colo;
   let region = "us-central1";
   if (EU_CF_COLOS.has(colo)) {
-    region = "europe-west3";
+    region = "europe-west4";
   } else if (ASIA_CF_COLOS.has(colo)) {
-    region = "asia-east1";
+    region = "us-west1";
   }
 
   // Construct the new URL for the Google Cloud AI Platform
