@@ -50,13 +50,23 @@ async function handleRequest(request, env) {
     }
 }
 
+const EU_CF_COLOS = new Set(["AMS","ATH","BCN","BEG","TXL","BTS","BRU","OTP","BUD","KIV","CPH","ORK","DUB","DUS","EDI","FRA","GVA","GOT","HAM","HEL","IST","ADB","KBP","LIS","LHR","LUX","MAD","MAN","MRS","MXP","MSQ","DME","MUC","LCA","OSL","PMO","CDG","PRG","KEF","RIX","FCO","LED","SOF","ARN","STR","TLL","TBS","SKG","TIA","VIE","VNO","WAW","ZAG","ZRH","LYS","BOD","SKP"]);
+const ASIA_CF_COLOS = new Set(["CGD","FUO","FOC","CAN","HAK","SJW","TAO","SHA","XIY","CGO","TNA","NNG","HGH","SZX","KWE","HYN","CGX","TEN","KHN","LHW","CGX","TEN","KHN","LHW","KOS","CGX","TEN","CGX","TEN","KHN","LHW"]);
+
 async function handleMessagesEndpoint(request, env, api_token, originalUrl) {
 
   // Parse the original path to extract model name and endpoint
   const pathParts = originalUrl.pathname.split('/');
   const modelName = pathParts[pathParts.length - 1].split(':')[0];
   const endpoint = pathParts[pathParts.length - 1].split(':')[1];
-  const region = "us-central1";
+
+  const colo = request.cf && request.cf.colo;
+  let region = "us-central1";
+  if (EU_CF_COLOS.has(colo)) {
+    region = "europe-west3";
+  } else if (ASIA_CF_COLOS.has(colo)) {
+    region = "asia-east1";
+  }
 
   // Construct the new URL for the Google Cloud AI Platform
   const gcpUrl = `https://${region}-aiplatform.googleapis.com/v1/projects/${env.PROJECT}/locations/${region}/publishers/google/models/${modelName}:${endpoint}`;
