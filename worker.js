@@ -1,8 +1,8 @@
-addEventListener("fetch", (event) => {
-    event.respondWith(handleRequest(event.request));
+addEventListener("fetch", (event, env) => {
+    event.respondWith(handleRequest(event.request, env));
 });
 
-async function handleRequest(request) {
+async function handleRequest(request, env) {
     let headers = new Headers({
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Headers": "*",
@@ -16,11 +16,11 @@ async function handleRequest(request) {
 
     let url = new URL(request.url);
     const apiKey = url.searchParams.get("key");
-    if (!API_KEY || API_KEY !== apiKey) {
+    if (!env.API_KEY || env.API_KEY !== apiKey) {
         return createErrorResponse(401, "authentication_error", "invalid x-api-key");
     }
     url.searchParams.delete("key");
-    const signedJWT = await createSignedJWT(CLIENT_EMAIL, PRIVATE_KEY)
+    const signedJWT = await createSignedJWT(env.CLIENT_EMAIL, env.PRIVATE_KEY)
     const [token, err] = await exchangeJwtForAccessToken(signedJWT)
     if (token === null) {
         console.log(`Invalid jwt token: ${err}`)
@@ -35,7 +35,7 @@ async function handleRequest(request) {
             switch(capturedPath) {
               case "/v1/models/":
               case "/v1beta/models/":
-                return await handleMessagesEndpoint(request, token, url);
+                return await handleMessagesEndpoint(request, env, token, url);
               default:
                 return createErrorResponse(404, "not_found_error", "Not Found");
             }
@@ -48,7 +48,7 @@ async function handleRequest(request) {
     }
 }
  
-async function handleMessagesEndpoint(request, api_token, originalUrl) {
+async function handleMessagesEndpoint(request, env, api_token, originalUrl) {
 
   // Parse the original path to extract model name and endpoint
   const pathParts = originalUrl.pathname.split('/');
@@ -57,7 +57,7 @@ async function handleMessagesEndpoint(request, api_token, originalUrl) {
   const region = "us-central1";
 
   // Construct the new URL for the Google Cloud AI Platform
-  const gcpUrl = `https://${region}-aiplatform.googleapis.com/v1/projects/${PROJECT}/locations/${region}/publishers/google/models/${modelName}:${endpoint}`;
+  const gcpUrl = `https://${region}-aiplatform.googleapis.com/v1/projects/${env.PROJECT}/locations/${region}/publishers/google/models/${modelName}:${endpoint}`;
 
   let payload;
   try {
