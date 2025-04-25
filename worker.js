@@ -1,22 +1,3 @@
-const MODELS = {
-    "gemini-1.0-pro": {
-        vertexName: "gemini-1.0-pro-002",
-        region: "us-central1",
-    },
-    "gemini-1.5-pro-latest": {
-        vertexName: "gemini-1.5-pro-002",
-        region: "us-central1",
-    },
-    "gemini-1.5-flash-latest": {
-        vertexName: "gemini-1.5-flash-002",
-        region: "us-central1",
-    },
-    "gemini-pro-vision": {
-        vertexName: "gemini-1.0-pro-vision-001",
-        region: "us-central1",
-    }
-};
-
 addEventListener("fetch", (event) => {
     event.respondWith(handleRequest(event.request));
 });
@@ -73,16 +54,10 @@ async function handleMessagesEndpoint(request, api_token, originalUrl) {
   const pathParts = originalUrl.pathname.split('/');
   const modelName = pathParts[pathParts.length - 1].split(':')[0];
   const endpoint = pathParts[pathParts.length - 1].split(':')[1];
-
-  // Check if the model exists in our MODELS object
-  if (!MODELS[modelName]) {
-    return createErrorResponse(400, "invalid_request_error", `Model '${modelName}' not supported.`);
-  }
-
-  const model = MODELS[modelName];
+  const region = "us-central1";
 
   // Construct the new URL for the Google Cloud AI Platform
-  const gcpUrl = `https://${model.region}-aiplatform.googleapis.com/v1/projects/${PROJECT}/locations/${model.region}/publishers/google/models/${model.vertexName}:${endpoint}`;
+  const gcpUrl = `https://${region}-aiplatform.googleapis.com/v1/projects/${PROJECT}/locations/${region}/publishers/google/models/${modelName}:${endpoint}`;
 
   let payload;
   try {
