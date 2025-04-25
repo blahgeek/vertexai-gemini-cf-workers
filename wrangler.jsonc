@@ -1,0 +1,5 @@
+{
+    "name": "vertexai-gemini-cf-workers",
+    "compatibility_date": "2025-04-25",
+    "main": "worker.js"
+}
