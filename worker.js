@@ -1,6 +1,8 @@
-addEventListener("fetch", (event) => {
-    event.respondWith(handleRequest(event.request, event.env));
-});
+export default {
+  async fetch(request, env, ctx) {
+    return await handleRequest(request, env);
+  },
+};
 
 async function handleRequest(request, env) {
     let headers = new Headers({
